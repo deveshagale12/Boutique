@@ -10,6 +10,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/boutique/auth")
+@CrossOrigin("*")
 public class AuthController {
 
     private final UserService userService;
