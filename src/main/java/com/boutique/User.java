@@ -23,7 +23,6 @@ public class User {
     
     private String mobileNumber;
 
-    @Temporal(TemporalType.DATE)
     private LocalDate dob;
 
 	public Long getId() {
