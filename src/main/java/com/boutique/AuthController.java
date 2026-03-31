@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -27,5 +28,19 @@ public class AuthController {
             "message", "Boutique user registered successfully!",
             "status", "SUCCESS"
         ));
+    }
+    
+    @PostMapping("/login")
+    public ResponseEntity<Object> login(@Valid @RequestBody LoginRequest request) {
+        User user = userService.loginUser(request);
+        
+        // Return success response with some user details (excluding password)
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Login successful!");
+        response.put("fullName", user.getFullName());
+        response.put("email", user.getEmail());
+        response.put("status", "SUCCESS");
+        
+        return ResponseEntity.ok(response);
     }
 }

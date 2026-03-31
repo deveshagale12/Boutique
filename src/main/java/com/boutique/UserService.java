@@ -27,4 +27,16 @@ public class UserService {
         
         userRepository.save(user);
     }
+	public User loginUser(LoginRequest request) {
+        // Find user or throw error if not found
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new RuntimeException("User not found with this email"));
+
+        // Compare plain-text passwords
+        if (!user.getPassword().equals(request.password())) {
+            throw new RuntimeException("Invalid password credentials");
+        }
+
+        return user;
+    }
 }
