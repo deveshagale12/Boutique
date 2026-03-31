@@ -28,6 +28,7 @@ public class WebConfig implements WebMvcConfigurer {
                     "http://127.0.0.1:5500", 
                     "http://localhost:5500", 
                     "http://localhost:8000",
+                    "https://boutique-0j9i.onrender.com",
                     "https://boutique-frontend.onrender.com" // Update with your actual frontend URL
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
