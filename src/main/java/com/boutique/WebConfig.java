@@ -20,4 +20,12 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(apiKeyInterceptor)
                 .addPathPatterns("/api/boutique/**");
     }
+    @Override
+public void addCorsMappings(CorsRegistry registry) {
+    registry.addMapping("/**")
+            .allowedOrigins("http://127.0.0.1:5500", "http://localhost:8000", "https://your-render-frontend-url.com","https://boutique-0j9i.onrender.com")
+            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+            .allowedHeaders("*")
+            .allowCredentials(true);
+}
 }
