@@ -10,6 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/boutique/admin/products")
+@CrossOrigin("*")
+
 public class ProductImageController {
 
     @Autowired
