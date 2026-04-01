@@ -25,7 +25,7 @@ public class Product {
     private Boolean isFeatured;
     private String mainImageUrl;
     
-    @Lob // Large Object
+    @JdbcTypeCode(Types.BINARY)
     @Column(name = "image_data", columnDefinition = "bytea") 
     private byte[] imageData;
 
