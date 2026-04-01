@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boutique | Authentication</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root { --accent: #1c1917; }
+        body { font-family: 'Inter', sans-serif; background-color: #fcfaf8; }
+        .serif { font-family: 'Bodoni Moda', serif; }
+        
+        /* Custom Loader */
+        .loader {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--accent);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Input underline animation */
+        .input-under {
+            position: relative;
+            overflow: hidden;
+        }
+        .input-under::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: var(--accent);
+            transition: all 0.4s ease;
+        }
+        .input-under:focus-within::after { left: 0; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="fixed top-0 left-0 w-full h-full opacity-[0.03] pointer-events-none z-0">
+        <div class="absolute top-10 left-10 text-[15rem] serif italic">B</div>
+        <div class="absolute bottom-10 right-10 text-[15rem] serif italic">O</div>
+    </div>
+
+    <main class="relative z-10 w-full max-w-[1000px] animate__animated animate__fadeIn">
+        <div class="bg-white shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] rounded-[2rem] overflow-hidden grid md:grid-cols-2">
+            
+            <div class="hidden md:block relative group">
+                <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&q=80&w=800" 
+                     class="h-full w-full object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all duration-1000" alt="Boutique">
+                <div class="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-all"></div>
+                <div class="absolute bottom-12 left-12 text-white">
+                    <p class="uppercase tracking-[0.4em] text-[10px] mb-2 opacity-80">Collection 2026</p>
+                    <h1 class="serif text-5xl italic font-light">Elegance is an <br>attitude.</h1>
+                </div>
+            </div>
+
+            <div class="p-10 lg:p-16 flex flex-col justify-center">
+                <div class="mb-10 text-center md:text-left">
+                    <h2 class="serif text-sm tracking-[0.5em] uppercase text-stone-400 mb-2">The Boutique</h2>
+                    <h3 id="form-title" class="serif text-4xl text-stone-900">Sign In</h3>
+                </div>
+
+                <div class="flex gap-8 mb-10 text-[11px] uppercase tracking-widest font-bold border-b border-stone-100">
+                    <button id="tab-login" class="pb-4 border-b-2 border-stone-900 text-stone-900 transition-all">Login</button>
+                    <button id="tab-register" class="pb-4 border-b-2 border-transparent text-stone-300 hover:text-stone-500 transition-all">Register</button>
+                </div>
+
+                <form id="auth-form" class="space-y-6">
+                    <div id="register-fields" class="hidden space-y-6 animate__animated animate__fadeInSmall">
+                        <div class="input-under">
+                            <input type="text" id="fullName" class="w-full bg-transparent py-3 outline-none text-sm placeholder:text-stone-300" placeholder="FULL NAME">
+                        </div>
+                        <div class="input-under">
+                            <input type="text" id="mobileNumber" class="w-full bg-transparent py-3 outline-none text-sm placeholder:text-stone-300" placeholder="MOBILE NUMBER">
+                        </div>
+                        <div class="input-under">
+                            <input type="date" id="dob" class="w-full bg-transparent py-3 outline-none text-sm text-stone-400">
+                        </div>
+                    </div>
+
+                    <div class="input-under">
+                        <input type="email" id="email" required class="w-full bg-transparent py-3 outline-none text-sm placeholder:text-stone-300" placeholder="EMAIL ADDRESS">
+                    </div>
+                    <div class="input-under">
+                        <input type="password" id="password" required class="w-full bg-transparent py-3 outline-none text-sm placeholder:text-stone-300" placeholder="PASSWORD">
+                    </div>
+
+                    <button type="submit" id="submit-btn" class="w-full bg-stone-900 text-white py-5 rounded-xl text-[11px] font-bold tracking-[0.3em] uppercase hover:bg-stone-800 transition-all shadow-xl active:scale-[0.98]">
+                        <span id="btn-text">Proceed</span>
+                    </button>
+                </form>
+
+                <p class="mt-8 text-center text-[10px] text-stone-400 tracking-widest uppercase">
+                    Secure checkout powered by Boutique Encryption
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const CONFIG = {
+            API_BASE: "https://boutique-0j9i.onrender.com/api/boutique/auth",
+            API_KEY: "my-secret-boutique-key-2026" // MATCH THIS TO RENDER ENV
+        };
+
+        let isLogin = true;
+        const form = document.getElementById('auth-form');
+        const tabLogin = document.getElementById('tab-login');
+        const tabRegister = document.getElementById('tab-register');
+        const regFields = document.getElementById('register-fields');
+        const formTitle = document.getElementById('form-title');
+        const submitBtn = document.getElementById('submit-btn');
+        const btnText = document.getElementById('btn-text');
+
+        // UI Toggles
+        tabLogin.onclick = () => {
+            isLogin = true;
+            regFields.classList.add('hidden');
+            tabLogin.className = "pb-4 border-b-2 border-stone-900 text-stone-900 transition-all";
+            tabRegister.className = "pb-4 border-b-2 border-transparent text-stone-300 hover:text-stone-500 transition-all";
+            formTitle.innerText = "Sign In";
+        };
+
+        tabRegister.onclick = () => {
+            isLogin = false;
+            regFields.classList.remove('hidden');
+            tabRegister.className = "pb-4 border-b-2 border-stone-900 text-stone-900 transition-all";
+            tabLogin.className = "pb-4 border-b-2 border-transparent text-stone-300 hover:text-stone-500 transition-all";
+            formTitle.innerText = "Join Us";
+        };
+
+        // Form Submit
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            
+            // Loading State Animation
+            btnText.innerHTML = `<span class="loader"></span> Processing...`;
+            submitBtn.disabled = true;
+
+            const endpoint = isLogin ? "/login" : "/register";
+            const payload = {
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+
+            if (!isLogin) {
+                payload.fullName = document.getElementById('fullName').value;
+                payload.mobileNumber = document.getElementById('mobileNumber').value;
+                payload.dob = document.getElementById('dob').value;
+            }
+
+            try {
+                const response = await fetch(CONFIG.API_BASE + endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-KEY': CONFIG.API_KEY
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    if (isLogin) {
+                        Swal.fire({
+                            title: 'Authenticating...',
+                            html: 'Welcome back to the collection.',
+                            timer: 2000,
+                            timerProgressBar: true,
+                            didOpen: () => { Swal.showLoading() }
+                        }).then(() => {
+                            localStorage.setItem('user', JSON.stringify(data));
+                            window.location.href = 'userdashboard.html';
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Registered!',
+                            text: 'Your account is ready. Please sign in.',
+                            confirmButtonColor: '#1c1917'
+                        });
+                        tabLogin.click();
+                    }
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Authentication Failed',
+                        text: data.error || "Invalid credentials provided.",
+                        confirmButtonColor: '#1c1917'
+                    });
+                }
+            } catch (err) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'System Offline',
+                    text: 'Unable to connect to the boutique server.',
+                    confirmButtonColor: '#1c1917'
+                });
+            } finally {
+                btnText.innerText = "Proceed";
+                submitBtn.disabled = false;
+            }
+        };
+    </script>
+</body>
+</html>

@@ -18,8 +18,9 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // Apply this check to all boutique API paths
         registry.addInterceptor(apiKeyInterceptor)
-                .addPathPatterns("/api/boutique/**");
+                .addPathPatterns("/api/boutique/**")
+                // ADD THIS LINE TO EXCLUDE IMAGE VIEWING
+                .excludePathPatterns("/api/boutique/admin/products/*/image/**");
     }
 }
