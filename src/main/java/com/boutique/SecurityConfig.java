@@ -13,21 +13,18 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            // 1. Disable CSRF for REST APIs (otherwise POST requests fail)
-            .csrf(csrf -> csrf.disable())
-            
-            // 2. Allow all requests to pass through Spring Security
-            // Your ApiKeyInterceptor will handle the actual validation
-            .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll()
-            )
-            
-            // 3. Disable the default Login Form
-            .formLogin(form -> form.disable())
-            .httpBasic(basic -> basic.disable());
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .csrf(csrf -> csrf.disable())
+        .authorizeHttpRequests(auth -> auth
+            // Specific rules go FIRST
+            .requestMatchers(HttpMethod.GET, "/api/boutique/admin/products/*/image/**").permitAll()
+            // General rules go LAST
+            .anyRequest().permitAll()
+        )
+        .formLogin(login -> login.disable())
+        .httpBasic(basic -> basic.disable());
 
-        return http.build();
-    }
+    return http.build();
+}
 }
