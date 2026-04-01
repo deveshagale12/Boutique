@@ -3,7 +3,7 @@ package com.boutique;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode; // Ensure this import is here
 import java.sql.Types;                       // Ensure this import is here
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name = "product_images")
 public class ProductImage {
@@ -19,6 +19,7 @@ public class ProductImage {
 
     @ManyToOne
     @JoinColumn(name = "product_id")
+    @JsonIgnore
     private Product product;
 
 	public Long getId() {
