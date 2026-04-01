@@ -1,6 +1,8 @@
 package com.boutique;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode; // Ensure this import is here
+import java.sql.Types;                       // Ensure this import is here
 
 @Entity
 @Table(name = "product_images")
@@ -9,7 +11,7 @@ public class ProductImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Lob
+    @JdbcTypeCode(Types.BINARY)
     @Column(columnDefinition = "bytea")
     private byte[] data;
 
