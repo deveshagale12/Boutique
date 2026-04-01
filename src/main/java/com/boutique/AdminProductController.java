@@ -7,7 +7,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/boutique/admin/products")
-@CrossOrigin("*")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class AdminProductController {
 
     private final ProductService productService;
