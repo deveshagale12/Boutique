@@ -1,6 +1,5 @@
 package com.boutique;
 
-import org.springframework.http.HttpMethod;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +22,6 @@ public class SecurityConfig {
             // Your ApiKeyInterceptor will handle the actual validation
             .authorizeHttpRequests(auth -> auth
                 .anyRequest().permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/boutique/admin/products/*/image/**").permitAll()
             )
             
             // 3. Disable the default Login Form
