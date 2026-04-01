@@ -1,5 +1,6 @@
 package com.boutique;
-
+import org.hibernate.annotations.JdbcTypeCode; // For the annotation
+import java.sql.Types;                       // For Types.BINARY
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
