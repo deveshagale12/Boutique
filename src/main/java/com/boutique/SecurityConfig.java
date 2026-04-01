@@ -1,4 +1,5 @@
 package com.boutique;
+import org.springframework.http.HttpMethod;
 
 
 import org.springframework.context.annotation.Bean;
