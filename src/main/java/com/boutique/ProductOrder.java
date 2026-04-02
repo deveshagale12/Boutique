@@ -1,5 +1,6 @@
 
 package com.boutique;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.time.LocalDateTime;
 
@@ -14,11 +15,14 @@ public class ProductOrder {
     // Link to the Product
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Product product;
 
     // Link to the User
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties({"password", "orders"})
+
     private User user;
 
     private Integer quantity;

@@ -1,10 +1,12 @@
 package com.boutique;
+import java.util.List;
 
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 
 @RestController
@@ -46,23 +48,25 @@ public class OrderController {
     }
 
     // ADMIN: Update Order (Accept/Edit)
-    @PutMapping("/admin/update/{orderId}")
-    public ResponseEntity<?> updateOrder(@PathVariable Long orderId, @RequestBody ProductOrder updateDetails) {
-        ProductOrder existingOrder = orderRepo.findById(orderId).orElseThrow();
-        
-        // Logic: If Admin Accepts, reduce stock
-        if ("ACCEPTED".equalsIgnoreCase(updateDetails.getStatus()) && !"ACCEPTED".equalsIgnoreCase(existingOrder.getStatus())) {
-            Product p = existingOrder.getProduct();
-            if (p.getStockQuantity() < existingOrder.getQuantity()) {
-                return ResponseEntity.badRequest().body("Insufficient stock to fulfill this order.");
-            }
-            p.setStockQuantity(p.getStockQuantity() - existingOrder.getQuantity());
-            productRepo.save(p);
-        }
+   @PutMapping("/admin/update/{orderId}")
+public ResponseEntity<?> updateOrder(@PathVariable Long orderId, @RequestBody Map<String, String> payload) {
+    ProductOrder existingOrder = orderRepo.findById(orderId)
+        .orElseThrow(() -> new RuntimeException("Order not found"));
+    
+    String newStatus = payload.get("status");
 
-        existingOrder.setStatus(updateDetails.getStatus());
-        return ResponseEntity.ok(orderRepo.save(existingOrder));
+    if ("ACCEPTED".equalsIgnoreCase(newStatus) && !"ACCEPTED".equalsIgnoreCase(existingOrder.getStatus())) {
+        Product p = existingOrder.getProduct();
+        if (p.getStockQuantity() < existingOrder.getQuantity()) {
+            return ResponseEntity.badRequest().body("Insufficient stock.");
+        }
+        p.setStockQuantity(p.getStockQuantity() - existingOrder.getQuantity());
+        productRepo.save(p);
     }
+
+    existingOrder.setStatus(newStatus);
+    return ResponseEntity.ok(orderRepo.save(existingOrder));
+}
 
     // ADMIN: Delete Order
     @DeleteMapping("/admin/delete/{orderId}")
@@ -70,4 +74,12 @@ public class OrderController {
         orderRepo.deleteById(orderId);
         return ResponseEntity.ok("Order removed from system.");
     }
+
+    // --- ADD THIS METHOD TO YOUR CONTROLLER ---
+    @GetMapping("/admin/all")
+public ResponseEntity<List<ProductOrder>> getAllOrders() {
+    // This will return the list exactly as your frontend expects
+    List<ProductOrder> allOrders = orderRepo.findAll();
+    return ResponseEntity.ok(allOrders);
+}
 }
