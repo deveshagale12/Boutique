@@ -31,16 +31,20 @@ public class AuthController {
     }
     
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@Valid @RequestBody LoginRequest request) {
-        User user = userService.loginUser(request);
-        
-        // Return success response with some user details (excluding password)
-        Map<String, Object> response = new HashMap<>();
-        response.put("message", "Login successful!");
-        response.put("fullName", user.getFullName());
-        response.put("email", user.getEmail());
-        response.put("status", "SUCCESS");
-        
-        return ResponseEntity.ok(response);
-    }
+public ResponseEntity<Object> login(@Valid @RequestBody LoginRequest request) {
+    User user = userService.loginUser(request);
+    
+    // Create the response map
+    Map<String, Object> response = new HashMap<>();
+    
+    // CRITICAL: Add the ID so the frontend can use it for orders!
+    response.put("id", user.getId()); 
+    
+    response.put("message", "Login successful!");
+    response.put("fullName", user.getFullName());
+    response.put("email", user.getEmail());
+    response.put("status", "SUCCESS");
+    
+    return ResponseEntity.ok(response);
+}
 }
