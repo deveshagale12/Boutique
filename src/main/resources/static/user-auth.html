@@ -111,9 +111,9 @@
     </main>
 
     <script>
-        const CONFIG = {
+       const CONFIG = {
             API_BASE: "https://boutique-0j9i.onrender.com/api/boutique/auth",
-            API_KEY: "my-secret-boutique-key-2026" // MATCH THIS TO RENDER ENV
+            API_KEY: "my-secret-boutique-key-2026" 
         };
 
         let isLogin = true;
@@ -125,7 +125,6 @@
         const submitBtn = document.getElementById('submit-btn');
         const btnText = document.getElementById('btn-text');
 
-        // UI Toggles
         tabLogin.onclick = () => {
             isLogin = true;
             regFields.classList.add('hidden');
@@ -142,11 +141,8 @@
             formTitle.innerText = "Join Us";
         };
 
-        // Form Submit
         form.onsubmit = async (e) => {
             e.preventDefault();
-            
-            // Loading State Animation
             btnText.innerHTML = `<span class="loader"></span> Processing...`;
             submitBtn.disabled = true;
 
@@ -173,16 +169,27 @@
                 });
 
                 const data = await response.json();
+                console.log("Server Response:", data); // DEBUG: Check if 'id' is here!
 
                 if (response.ok) {
                     if (isLogin) {
+                        // CRITICAL CHECK: Ensure the ID exists in the response
+                        if (!data.id) {
+                            console.error("Login successful but 'id' is missing from API response!");
+                            Swal.fire('API Error', 'Server did not return a User ID. Check your Backend Controller.', 'warning');
+                            btnText.innerText = "Proceed";
+                            submitBtn.disabled = false;
+                            return;
+                        }
+
                         Swal.fire({
                             title: 'Authenticating...',
                             html: 'Welcome back to the collection.',
-                            timer: 2000,
+                            timer: 1500,
                             timerProgressBar: true,
                             didOpen: () => { Swal.showLoading() }
                         }).then(() => {
+                            // Save the confirmed data
                             localStorage.setItem('user', JSON.stringify(data));
                             window.location.href = 'userdashboard.html';
                         });
@@ -199,7 +206,7 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Authentication Failed',
-                        text: data.error || "Invalid credentials provided.",
+                        text: data.error || "Invalid credentials.",
                         confirmButtonColor: '#1c1917'
                     });
                 }
