@@ -14,18 +14,30 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Bean
-public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
-        .csrf(csrf -> csrf.disable())
-        .authorizeHttpRequests(auth -> auth
-            // Specific rules go FIRST
-            .requestMatchers(HttpMethod.GET, "/api/boutique/admin/products/*/image/**").permitAll()
-            // General rules go LAST
-            .anyRequest().permitAll()
-        )
-        .formLogin(login -> login.disable())
-        .httpBasic(basic -> basic.disable());
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ADD THIS
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(HttpMethod.GET, "/api/boutique/admin/products/*/image/**").permitAll()
+                .anyRequest().permitAll()
+            )
+            .formLogin(login -> login.disable())
+            .httpBasic(basic -> basic.disable());
 
-    return http.build();
-}
+        return http.build();
+    }
+
+    // This Bean handles the CORS handshake
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("*")); // Allows local files and Render
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("X-API-KEY", "Content-Type", "Authorization"));
+        
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 }
