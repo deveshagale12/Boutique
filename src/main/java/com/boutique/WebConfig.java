@@ -17,10 +17,17 @@ public class WebConfig implements WebMvcConfigurer {
     }
 
     @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("*") // In production, replace with your actual frontend URL
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedHeaders("*");
+    }
+
+    @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(apiKeyInterceptor)
                 .addPathPatterns("/api/boutique/**")
-                // ADD THIS LINE TO EXCLUDE IMAGE VIEWING
                 .excludePathPatterns("/api/boutique/admin/products/*/image/**");
     }
 }
